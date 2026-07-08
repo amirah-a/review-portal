@@ -15,29 +15,27 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Register any application services.
      */
-    public function register(): void
-    {
-        
-    }
+    public function register(): void {}
 
     /**
      * Bootstrap any application services.
      */
     public function boot(): void
     {
-        Livewire::setScriptRoute(function ($handle) {
-            return Route::get('/lead-up-review/livewire/livewire.js', $handle);
-        });
 
-        Livewire::setUpdateRoute(function ($handle) {
-            return Route::post('/lead-up-review/livewire/update', $handle);
-        });
-
-        URL::forceRootUrl(config('app.url'));
 
         if (config('app.env') !== 'local') {
             URL::forceScheme('https');
-			URL::forceRootUrl(config('app.url'));
+            URL::forceRootUrl(config('app.url'));
+            
+            Livewire::setScriptRoute(function ($handle) {
+                return Route::get('/lead-up-review/livewire/livewire.js', $handle);
+            });
+
+            Livewire::setUpdateRoute(function ($handle) {
+                return Route::post('/lead-up-review/livewire/update', $handle);
+            });
+
         }
     }
 }

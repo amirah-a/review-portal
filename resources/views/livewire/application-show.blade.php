@@ -579,7 +579,8 @@
                                         <label
                                             class="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition cursor-pointer">
                                             <input type="radio" wire:model="APL_Status" value="Open"
-                                                class="h-4 w-4 text-amber-600 border-slate-300 dark:border-slate-700" disabled>
+                                                class="h-4 w-4 text-amber-600 border-slate-300 dark:border-slate-700"
+                                                disabled>
                                             <span class="text-sm text-slate-700 dark:text-slate-300 font-medium">
                                                 Open
                                             </span>
@@ -587,8 +588,7 @@
 
                                         <label
                                             class="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition cursor-pointer">
-                                            <input type="radio" wire:model="APL_Status"
-                                                value="Pending Review"
+                                            <input type="radio" wire:model="APL_Status" value="Pending Review"
                                                 class="h-4 w-4 text-amber-600 border-slate-300 dark:border-slate-700">
                                             <span class="text-sm text-slate-700 dark:text-slate-300 font-medium">
                                                 Pending Review

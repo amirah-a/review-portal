@@ -35,7 +35,7 @@ class ApplicationsTable extends Component implements HasActions, HasSchemas, Has
             })
 
             // Instructs the browser to open that generated route in a new tab/window
-            ->openRecordUrlInNewTab()
+            // ->openRecordUrlInNewTab()
 
             ->columns([
 
