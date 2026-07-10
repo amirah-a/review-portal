@@ -17,24 +17,14 @@ class IndexController extends Controller
         $declined = Application::where('APL_Status', 'Declined')->count();
 
         $centres = DB::table('programme_centres')
-            ->select('name', 'location')
+            ->select('id', 'name', 'location')
             ->selectSub(function ($query) {
-                $query->from('applications')
-                    ->selectRaw('COUNT(*)')
-                    // TRIM eliminates hidden spaces, LOWER ignores case discrepancies
-                    ->whereRaw('TRIM(LOWER(applications.APL_Programme_Center)) = TRIM(LOWER(programme_centres.name))');
+                $query->from('applications')->selectRaw('COUNT(*)')->whereRaw('TRIM(LOWER(applications.APL_Programme_Center)) = TRIM(LOWER(programme_centres.name))');
             }, 'applications_count')
             ->orderBy('name', 'asc')
             ->get();
 
-        return view('dashboard', compact(
-            'totalApplications',
-            'open',
-            'underReview',
-            'approved',
-            'declined',
-            'centres'
-        ));
+        return view('dashboard', compact('totalApplications', 'open', 'underReview', 'approved', 'declined', 'centres'));
     }
 
     public function viewAll()
@@ -47,10 +37,7 @@ class IndexController extends Controller
         $application = \App\Models\Application::findOrFail($id);
 
         // Get metadata rows, keyed by the code identifier strings
-        $fields = \DB::table('form_data')
-            ->where('Field_Name', '<>', '')
-            ->get()
-            ->keyBy('Field_Name');
+        $fields = \DB::table('form_data')->where('Field_Name', '<>', '')->get()->keyBy('Field_Name');
 
         return view('livewire.pages.applications.show-record', compact('application', 'fields'));
     }

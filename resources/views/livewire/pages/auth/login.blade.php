@@ -25,9 +25,9 @@ new #[Layout('layouts.guest')] class extends Component
 
 <div class="fixed inset-0 min-h-screen w-screen flex flex-col bg-slate-50/70 overflow-y-auto px-4 py-8 sm:px-6 lg:px-8 z-50">
     <div class="w-full max-w-md mx-auto my-auto">
-        
+
         <div class="bg-white border border-slate-100 rounded-2xl shadow-[0_24px_48px_-15px_rgba(15,118,110,0.06)] overflow-hidden">
-            
+
             <div class="bg-gradient-to-r from-teal-800 via-teal-900 to-cyan-950 px-8 py-4.5 text-left relative shadow-sm">
                 <div class="flex items-center justify-between">
                     <div>
@@ -43,15 +43,15 @@ new #[Layout('layouts.guest')] class extends Component
                 <div>
                     <x-input-label for="email" :value="__('Email Address')" class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1.5" />
                     <div class="relative group">
-                        <x-text-input 
-                            wire:model="form.email" 
-                            id="email" 
-                            class="block w-full px-4 py-3 bg-slate-50/50 border border-slate-100 rounded-xl text-sm text-slate-800 placeholder-slate-300 focus:bg-white focus:border-teal-500/40 focus:ring-4 focus:ring-teal-500/5 focus:outline-none transition-all duration-150" 
-                            type="email" 
-                            name="email" 
-                            required 
-                            autofocus 
-                            autocomplete="username" 
+                        <x-text-input
+                            wire:model="form.email"
+                            id="email"
+                            class="block w-full px-4 py-3 bg-slate-50/50 border border-slate-100 rounded-xl text-sm text-slate-800 placeholder-slate-300 focus:bg-white focus:border-teal-500/40 focus:ring-4 focus:ring-teal-500/5 focus:outline-none transition-all duration-150"
+                            type="email"
+                            name="email"
+                            required
+                            autofocus
+                            autocomplete="username"
                             placeholder="parent@domain.com"
                         />
                     </div>
@@ -68,14 +68,14 @@ new #[Layout('layouts.guest')] class extends Component
                         @endif
                     </div>
                     <div class="relative group">
-                        <x-text-input 
-                            wire:model="form.password" 
-                            id="password" 
+                        <x-text-input
+                            wire:model="form.password"
+                            id="password"
                             class="block w-full px-4 py-3 bg-slate-50/50 border border-slate-100 rounded-xl text-sm text-slate-800 placeholder-slate-300 focus:bg-white focus:border-teal-500/40 focus:ring-4 focus:ring-teal-500/5 focus:outline-none transition-all duration-150"
                             type="password"
                             name="password"
-                            required 
-                            autocomplete="current-password" 
+                            required
+                            autocomplete="current-password"
                             placeholder="••••••••"
                         />
                     </div>
@@ -84,11 +84,11 @@ new #[Layout('layouts.guest')] class extends Component
 
                 <div class="flex items-center pt-1">
                     <label for="remember" class="inline-flex items-center cursor-pointer select-none group">
-                        <input 
-                            wire:model="form.remember" 
-                            id="remember" 
-                            type="checkbox" 
-                            class="h-4 w-4 rounded border-slate-200 text-teal-600 focus:ring-teal-500/20 focus:ring-offset-0 bg-transparent transition cursor-pointer" 
+                        <input
+                            wire:model="form.remember"
+                            id="remember"
+                            type="checkbox"
+                            class="h-4 w-4 rounded border-slate-200 text-teal-600 focus:ring-teal-500/20 focus:ring-offset-0 bg-transparent transition cursor-pointer"
                             name="remember"
                         >
                         <span class="ms-2.5 text-xs font-semibold text-slate-400 group-hover:text-slate-600 transition-colors duration-150">

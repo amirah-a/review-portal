@@ -1,0 +1,119 @@
+<?php
+
+namespace App\Livewire;
+
+use App\Models\Application;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
+use Filament\Schemas\Contracts\HasSchemas;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Table;
+use Illuminate\Contracts\View\View;
+use Livewire\Component;
+
+class CentreApplicationsTable extends Component implements HasActions, HasSchemas, HasTable
+{
+    use InteractsWithActions;
+    use InteractsWithSchemas;
+    use InteractsWithTable;
+
+
+    public $centre;
+
+
+    public function mount($centre)
+    {
+        $this->centre = $centre;
+    }
+
+
+    public function table(Table $table): Table
+    {
+        return $table
+
+            ->query(
+                Application::query()
+                    ->where(
+                        'APL_Programme_Center',
+                        $this->centre->name
+                    )
+            )
+
+            ->defaultSort('created_at', 'desc')
+
+
+            ->recordUrl(function (Application $record) {
+                return route('applications.show', [
+                    'id' => $record->APL_ID
+                ]);
+            })
+
+
+            ->columns([
+
+                TextColumn::make('APL_ID')
+                    ->label('ID')
+                    ->sortable(),
+
+
+                TextColumn::make('APL_FName')
+                    ->label('First Name')
+                    ->searchable()
+                    ->sortable(),
+
+
+                TextColumn::make('APL_LName')
+                    ->label('Last Name')
+                    ->searchable()
+                    ->sortable(),
+
+
+                TextColumn::make('APL_Age')
+                    ->label('Age')
+                    ->sortable(),
+
+
+                TextColumn::make('APL_Sex')
+                    ->label('Gender')
+                    ->sortable(),
+
+
+                TextColumn::make('APL_Parent_Name')
+                    ->label('Parent')
+                    ->searchable(),
+
+
+                TextColumn::make('APL_Parent_Cellphone')
+                    ->label('Phone'),
+
+
+                TextColumn::make('APL_Status')
+                    ->label('Status')
+                    ->badge()
+                    ->colors([
+                        'info' => 'Open',
+                        'warning' => 'Pending Review',
+                        'success' => 'Accepted',
+                        'danger' => 'Declined',
+                    ])
+                    ->sortable()
+                    ->searchable(),
+
+
+                TextColumn::make('created_at')
+                    ->label('Submitted')
+                    ->date('d M Y')
+                    ->sortable(),
+
+            ]);
+    }
+
+
+    public function render(): View
+    {
+        return view('livewire.pages.applications.filament.centre-applications-table');
+    }
+}

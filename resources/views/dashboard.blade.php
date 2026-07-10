@@ -188,16 +188,19 @@
                         {{-- FOOTER ACTION --}}
                         <div
                             class="mt-6 pt-4 border-t border-gray-50 flex items-center justify-between text-sm text-gray-500">
-                            <span class="text-xs font-medium text-gray-400">Applications metrics breakdown</span>
-                            <span
-                                class="flex items-center gap-1 text-xs font-semibold text-amber-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition duration-300 pointer-events-none">
+                            <span class="text-xs font-medium text-gray-400">
+                                Applications metrics breakdown
+                            </span>
+
+                            <a href="{{ route('centres.show', $centre->id) }}"
+                                class="flex items-center gap-1 text-xs font-semibold text-amber-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition duration-300">
                                 View Details
                                 <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
                                     stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                                 </svg>
-                            </span>
+                            </a>
                         </div>
 
                     </div>
