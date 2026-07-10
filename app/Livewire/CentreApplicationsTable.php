@@ -12,6 +12,8 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
+use Filament\Actions\BulkAction;
+use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
 
 class CentreApplicationsTable extends Component implements HasActions, HasSchemas, HasTable
@@ -20,75 +22,41 @@ class CentreApplicationsTable extends Component implements HasActions, HasSchema
     use InteractsWithSchemas;
     use InteractsWithTable;
 
-
     public $centre;
-
 
     public function mount($centre)
     {
         $this->centre = $centre;
     }
 
-
     public function table(Table $table): Table
     {
         return $table
 
-            ->query(
-                Application::query()
-                    ->where(
-                        'APL_Programme_Center',
-                        $this->centre->name
-                    )
-            )
+            ->query(Application::query()->where('APL_Programme_Center', $this->centre->name))
 
             ->defaultSort('created_at', 'desc')
 
-
             ->recordUrl(function (Application $record) {
                 return route('applications.show', [
-                    'id' => $record->APL_ID
+                    'id' => $record->APL_ID,
                 ]);
             })
 
-
             ->columns([
+                TextColumn::make('APL_ID')->label('ID')->sortable(),
 
-                TextColumn::make('APL_ID')
-                    ->label('ID')
-                    ->sortable(),
+                TextColumn::make('APL_FName')->label('First Name')->searchable()->sortable(),
 
+                TextColumn::make('APL_LName')->label('Last Name')->searchable()->sortable(),
 
-                TextColumn::make('APL_FName')
-                    ->label('First Name')
-                    ->searchable()
-                    ->sortable(),
+                TextColumn::make('APL_Age')->label('Age')->sortable(),
 
+                TextColumn::make('APL_Sex')->label('Gender')->sortable(),
 
-                TextColumn::make('APL_LName')
-                    ->label('Last Name')
-                    ->searchable()
-                    ->sortable(),
+                TextColumn::make('APL_Parent_Name')->label('Parent')->searchable(),
 
-
-                TextColumn::make('APL_Age')
-                    ->label('Age')
-                    ->sortable(),
-
-
-                TextColumn::make('APL_Sex')
-                    ->label('Gender')
-                    ->sortable(),
-
-
-                TextColumn::make('APL_Parent_Name')
-                    ->label('Parent')
-                    ->searchable(),
-
-
-                TextColumn::make('APL_Parent_Cellphone')
-                    ->label('Phone'),
-
+                TextColumn::make('APL_Parent_Cellphone')->label('Phone'),
 
                 TextColumn::make('APL_Status')
                     ->label('Status')
@@ -102,15 +70,52 @@ class CentreApplicationsTable extends Component implements HasActions, HasSchema
                     ->sortable()
                     ->searchable(),
 
+                TextColumn::make('created_at')->label('Submitted')->date('d M Y')->sortable(),
+            ])
+            ->bulkActions([
+                BulkAction::make('approve')
+                    ->label('Approve Selected')
+                    ->icon('heroicon-o-check')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->action(function (Collection $records) {
+                        $records->each->update([
+                            'APL_Status' => 'Accepted',
+                        ]);
+                    })
+                    ->after(function () {
+                        $this->resetTable();
+                    }),
 
-                TextColumn::make('created_at')
-                    ->label('Submitted')
-                    ->date('d M Y')
-                    ->sortable(),
+                BulkAction::make('decline')
+                    ->label('Decline Selected')
+                    ->icon('heroicon-o-x-mark')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->action(function (Collection $records) {
+                        $records->each->update([
+                            'APL_Status' => 'Declined',
+                        ]);
+                    })
+                    ->after(function () {
+                        $this->resetTable();
+                    }),
 
+                BulkAction::make('pending')
+                    ->label('Move to Pending Review')
+                    ->icon('heroicon-o-clock')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->action(function (Collection $records) {
+                        $records->each->update([
+                            'APL_Status' => 'Pending Review',
+                        ]);
+                    })
+                    ->after(function () {
+                        $this->resetTable();
+                    }),
             ]);
     }
-
 
     public function render(): View
     {

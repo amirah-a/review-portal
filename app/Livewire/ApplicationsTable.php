@@ -12,6 +12,8 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
+use Filament\Actions\BulkAction;
+use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
 
 class ApplicationsTable extends Component implements HasActions, HasSchemas, HasTable
@@ -23,9 +25,7 @@ class ApplicationsTable extends Component implements HasActions, HasSchemas, Has
     public function table(Table $table): Table
     {
         return $table
-            ->query(
-                Application::query()
-            )
+            ->query(Application::query())
 
             ->defaultSort('created_at', 'desc')
 
@@ -38,32 +38,17 @@ class ApplicationsTable extends Component implements HasActions, HasSchemas, Has
             // ->openRecordUrlInNewTab()
 
             ->columns([
+                TextColumn::make('APL_ID')->label('ID')->sortable(),
 
-                TextColumn::make('APL_ID')
-                    ->label('ID')
-                    ->sortable(),
+                TextColumn::make('APL_FName')->label('First Name')->searchable()->sortable(),
 
-                TextColumn::make('APL_FName')
-                    ->label('First Name')
-                    ->searchable()
-                    ->sortable(),
+                TextColumn::make('APL_LName')->label('Last Name')->searchable()->sortable(),
 
-                TextColumn::make('APL_LName')
-                    ->label('Last Name')
-                    ->searchable()
-                    ->sortable(),
+                TextColumn::make('APL_Programme_Center')->label('Centre')->sortable()->searchable(),
 
-                TextColumn::make('APL_Programme_Center')
-                    ->label('Centre')
-                    ->sortable()
-                    ->searchable(),
+                TextColumn::make('APL_Parent_Name')->label('Parent')->searchable(),
 
-                TextColumn::make('APL_Parent_Name')
-                    ->label('Parent')
-                    ->searchable(),
-
-                TextColumn::make('APL_Parent_Cellphone')
-                    ->label('Phone'),
+                TextColumn::make('APL_Parent_Cellphone')->label('Phone'),
 
                 TextColumn::make('APL_Status')
                     ->label('Status')
@@ -74,7 +59,50 @@ class ApplicationsTable extends Component implements HasActions, HasSchemas, Has
                         'danger' => 'Declined',
                     ])
                     ->sortable()
-                    ->searchable()
+                    ->searchable(),
+            ])
+            ->bulkActions([
+                BulkAction::make('approve')
+                    ->label('Approve Selected')
+                    ->icon('heroicon-o-check')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->action(function (Collection $records) {
+                        $records->each->update([
+                            'APL_Status' => 'Accepted',
+                        ]);
+                    })
+                    ->after(function () {
+                        $this->resetTable();
+                    }),
+
+                BulkAction::make('decline')
+                    ->label('Decline Selected')
+                    ->icon('heroicon-o-x-mark')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->action(function (Collection $records) {
+                        $records->each->update([
+                            'APL_Status' => 'Declined',
+                        ]);
+                    })
+                    ->after(function () {
+                        $this->resetTable();
+                    }),
+
+                BulkAction::make('pending')
+                    ->label('Move to Pending Review')
+                    ->icon('heroicon-o-clock')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->action(function (Collection $records) {
+                        $records->each->update([
+                            'APL_Status' => 'Pending Review',
+                        ]);
+                    })
+                    ->after(function () {
+                        $this->resetTable();
+                    }),
             ]);
     }
 
