@@ -66,5 +66,16 @@ class IndexController extends Controller
         // ]);
     }
 
-    public function liveMail() {}
+    public function liveMail()
+    {
+        $applications = Application::query()->where('APL_Status', 'Accepted')->where('APL_INVALID', 1)->whereNull('acceptance_email_sent_at')->get();
+
+        foreach ($applications as $application) {
+            Mail::to($application->APL_Parent_Email)->send(new LeadUpAcceptedMail($application));
+
+            $application->update([
+                'acceptance_email_sent_at' => now(),
+            ]);
+        }
+    }
 }

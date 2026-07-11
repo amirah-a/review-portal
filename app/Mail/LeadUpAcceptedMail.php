@@ -20,7 +20,7 @@ class LeadUpAcceptedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'RAPP LEAD-UP Programme Acceptance',
+            subject: 'Congratulations! Your Child Has Been Selected for the RAPP LEAD-UP Vacation Programme',
         );
     }
 
