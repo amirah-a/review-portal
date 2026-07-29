@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Attendance;
 
 class Application extends Model
 {
@@ -172,5 +173,14 @@ class Application extends Model
     public function latestReview()
     {
         return $this->hasOne(ApplicationReview::class)->latestOfMany();
+    }
+
+    public function attendances()
+    {
+        return $this->hasMany(
+            Attendance::class,
+            'application_id',
+            'APL_ID'
+        );
     }
 }

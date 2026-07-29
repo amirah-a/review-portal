@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\IndexController;
 use App\Livewire\ApplicationShow;
 use Illuminate\Support\Facades\Storage;
+use App\Livewire\Coordinator\AttendanceRegister;
 
 Route::view('/', 'welcome');
 
@@ -28,16 +29,13 @@ Route::middleware(['auth', 'role:reviewer,chairman'])->group(function () {
         ->where('path', '.*')
         ->name('documents.show');
 
-     Route::get('/email/send-test', [IndexController::class, 'testMail'])->name('testMail');
-     Route::get('/email/send-live', [IndexController::class, 'liveMail'])->name('liveMail');
-
+    Route::get('/email/send-test', [IndexController::class, 'testMail'])->name('testMail');
+    Route::get('/email/send-live', [IndexController::class, 'liveMail'])->name('liveMail');
 });
 
 Route::middleware(['auth', 'role:coordinator'])->group(function () {
     Route::get('/coordinator/dashboard', [CoordinatorController::class, 'index'])->name('coordinator.dashboard');
-    Route::get('/coordinator/attendance', [CoordinatorController::class, 'attendance'])->name('coordinator.attendance');
-
-
+    Route::get('/coordinator/attendance', AttendanceRegister::class)->name('coordinator.attendance');
 });
 
 Route::view('profile', 'profile')

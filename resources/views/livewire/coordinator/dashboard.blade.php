@@ -1,6 +1,5 @@
 <x-app-layout>
 
-
     <x-slot name="header">
 
         <div class="flex items-center justify-between border-b border-gray-100 pb-5">
@@ -11,11 +10,9 @@
                     Coordinator Dashboard
                 </h2>
 
-
                 <p class="text-sm font-medium text-gray-500 mt-1">
                     Manage daily attendance for your assigned centre.
                 </p>
-
 
             </div>
 
@@ -24,19 +21,15 @@
     </x-slot>
 
 
-
-
     <div class="py-10 bg-gray-50/50 min-h-screen">
 
 
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
 
 
-
             {{-- Centre Information --}}
 
             <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-
 
                 <div class="flex items-center justify-between">
 
@@ -49,17 +42,11 @@
 
 
                         <h3 class="text-xl font-bold text-gray-900 mt-1">
-                            {{ $centre->name ?? 'No Centre Assigned' }}
+                            {{ $centre ?? 'No Centre Assigned' }}
                         </h3>
 
 
-                        <p class="text-sm text-gray-500">
-                            {{ $centre->location ?? '' }}
-                        </p>
-
-
                     </div>
-
 
 
                     <div class="bg-amber-50 text-amber-700 px-4 py-2 rounded-lg text-sm font-semibold">
@@ -71,9 +58,7 @@
 
                 </div>
 
-
             </div>
-
 
 
 
@@ -83,9 +68,9 @@
             <div class="grid grid-cols-1 md:grid-cols-5 gap-5">
 
 
+                {{-- Participants --}}
 
                 <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-
 
                     <p class="text-xs font-semibold text-gray-400 uppercase">
                         Participants
@@ -93,17 +78,22 @@
 
 
                     <p class="text-3xl font-black text-gray-900 mt-2">
-                        {{ $participants }}
+                        {{ $summary['total_students'] ?? 0 }}
                     </p>
-
 
                 </div>
 
 
 
 
+                @foreach([
+                    ['Present', 'present', 'emerald'],
+                    ['Late', 'late', 'amber'],
+                    ['Absent', 'absent', 'red'],
+                    ['Excused', 'excused', 'blue']
+                ] as $card)
 
-                @foreach ([['Present', $summary['present'], 'emerald'], ['Late', $summary['late'], 'amber'], ['Absent', $summary['absent'], 'red'], ['Excused', $summary['excused'], 'blue']] as $card)
+
                     <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
 
 
@@ -113,17 +103,19 @@
 
 
                         <p class="text-3xl font-black text-{{ $card[2] }}-600 mt-2">
-                            {{ $card[1] }}
+
+                            {{ $summary[$card[1]] ?? 0 }}
+
                         </p>
 
 
                     </div>
+
+
                 @endforeach
 
 
-
             </div>
-
 
 
 
@@ -139,7 +131,6 @@
 
                     <div>
 
-
                         <h3 class="text-lg font-bold text-gray-900">
                             Daily Attendance
                         </h3>
@@ -149,18 +140,14 @@
                             Record attendance for today's session.
                         </p>
 
-
                     </div>
 
 
 
-
                     <a href="{{ route('coordinator.attendance') }}"
-                        class="inline-flex items-center px-5 py-3 rounded-lg bg-amber-500 text-white font-semibold text-sm hover:bg-amber-600 transition">
-
+                       class="inline-flex items-center px-5 py-3 rounded-lg bg-amber-500 text-white font-semibold text-sm hover:bg-amber-600 transition">
 
                         Record Attendance
-
 
                     </a>
 
@@ -175,8 +162,8 @@
 
 
 
-
             {{-- Recent Attendance --}}
+
 
             <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
 
@@ -190,6 +177,7 @@
 
 
                 </div>
+
 
 
 
@@ -222,6 +210,16 @@
 
 
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
+                                    Late
+                                </th>
+
+
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
+                                    Excused
+                                </th>
+
+
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
                                     Recorded By
                                 </th>
 
@@ -234,33 +232,61 @@
 
 
 
+
                         <tbody class="divide-y divide-gray-100">
 
 
                             @forelse($recentAttendance as $attendance)
+
+
                                 <tr>
 
 
                                     <td class="px-6 py-4">
-                                        {{ $attendance->date->format('d M Y') }}
+
+                                        {{ \Carbon\Carbon::parse($attendance->attendance_date)->format('d M Y') }}
+
                                     </td>
 
 
 
                                     <td class="px-6 py-4 text-emerald-600 font-semibold">
+
                                         {{ $attendance->present }}
+
                                     </td>
 
 
 
                                     <td class="px-6 py-4 text-red-600 font-semibold">
+
                                         {{ $attendance->absent }}
+
                                     </td>
 
 
 
+                                    <td class="px-6 py-4 text-amber-600 font-semibold">
+
+                                        {{ $attendance->late }}
+
+                                    </td>
+
+
+
+                                    <td class="px-6 py-4 text-blue-600 font-semibold">
+
+                                        {{ $attendance->excused }}
+
+                                    </td>
+
+
+
+
                                     <td class="px-6 py-4">
-                                        {{ $attendance->user->name ?? 'System' }}
+
+                                        {{ \App\Models\User::find($attendance->recorded_by)?->name ?? 'System' }}
+
                                     </td>
 
 
@@ -273,15 +299,19 @@
 
                                 <tr>
 
-                                    <td colspan="4" class="px-6 py-6 text-center text-gray-500">
+
+                                    <td colspan="6"
+                                        class="px-6 py-6 text-center text-gray-500">
 
                                         No attendance recorded yet.
 
                                     </td>
 
-                                </tr>
-                            @endforelse
 
+                                </tr>
+
+
+                            @endforelse
 
 
                         </tbody>
@@ -297,8 +327,8 @@
 
 
 
-
         </div>
+
 
     </div>
 

@@ -2,31 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Models\Application;
 use App\Models\Attendance;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 
 class CoordinatorController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
-
-        $centreName = $user->coordinator_location;
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Centre Information
-        |--------------------------------------------------------------------------
-        */
-
-        $centre = (object) [
-            'name' => $centreName,
-            'location' => $centreName,
-        ];
-
+        $centre = auth()->user()->coordinator_location;
 
 
         /*
@@ -35,118 +19,80 @@ class CoordinatorController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $participants = Application::where('APL_Status', 'Approved')
-            ->where('APL_Programme_Center', $centreName)
-            ->count();
+        $applications = Application::where('APL_Status', 'Accepted')
+            ->where('APL_Programme_Center', $centre)
+            ->get();
 
 
 
         /*
         |--------------------------------------------------------------------------
-        | Today's Attendance
+        | Today Attendance Summary
         |--------------------------------------------------------------------------
         */
 
-        $todayAttendance = Attendance::whereDate(
+        $todayRecords = Attendance::whereDate(
                 'attendance_date',
-                Carbon::today()
+                today()
             )
-            ->where('centre', $centreName)
-            ->first();
+            ->where('centre', $centre)
+            ->get();
 
 
 
-        $presentToday = 0;
-        $lateToday = 0;
-        $absentToday = 0;
-        $excusedToday = 0;
+        $summary = [
+            'total_students' => $applications->count(),
+            
+            'present' => $todayRecords->where('status', 'Present')->count(),
 
+            'late' => $todayRecords->where('status', 'Late')->count(),
 
+            'absent' => $todayRecords->where('status', 'Absent')->count(),
 
-        if ($todayAttendance) {
-
-            $attendanceData = collect(
-                $todayAttendance->attendance_data ?? []
-            );
-
-
-            $presentToday = $attendanceData
-                ->where('status', 'Present')
-                ->count();
-
-
-            $lateToday = $attendanceData
-                ->where('status', 'Late')
-                ->count();
-
-
-            $absentToday = $attendanceData
-                ->where('status', 'Absent')
-                ->count();
-
-
-            $excusedToday = $attendanceData
-                ->where('status', 'Excused')
-                ->count();
-
-        }
+            'excused' => $todayRecords->where('status', 'Excused')->count(),
+        ];
 
 
 
         /*
         |--------------------------------------------------------------------------
-        | Attendance History
+        | Recent Attendance Records
         |--------------------------------------------------------------------------
         */
 
-        $recentAttendance = Attendance::where('centre', $centreName)
-            ->latest('attendance_date')
+        $recentAttendance = Attendance::where(
+                'centre',
+                $centre
+            )
+            ->selectRaw('
+                attendance_date,
+                recorded_by,
+                COUNT(CASE WHEN status = "Present" THEN 1 END) as present,
+                COUNT(CASE WHEN status = "Absent" THEN 1 END) as absent,
+                COUNT(CASE WHEN status = "Late" THEN 1 END) as late,
+                COUNT(CASE WHEN status = "Excused" THEN 1 END) as excused
+            ')
+            ->groupBy(
+                'attendance_date',
+                'recorded_by'
+            )
+            ->orderBy(
+                'attendance_date',
+                'desc'
+            )
             ->limit(10)
-            ->get()
-            ->map(function ($attendance) {
-
-
-                $data = collect(
-                    $attendance->attendance_data ?? []
-                );
-
-
-                $attendance->date = Carbon::parse(
-                    $attendance->attendance_date
-                );
-
-
-                $attendance->present = $data
-                    ->where('status', 'Present')
-                    ->count();
-
-
-                $attendance->absent = $data
-                    ->where('status', 'Absent')
-                    ->count();
-
-
-                return $attendance;
-
-            });
+            ->get();
 
 
 
-        return view('livewire.coordinator.dashboard', [
-
-            'centre' => $centre,
-
-            'participants' => $participants,
-
-            'summary' => [
-                'present' => $presentToday,
-                'late' => $lateToday,
-                'absent' => $absentToday,
-                'excused' => $excusedToday,
-            ],
-
-            'recentAttendance' => $recentAttendance,
-
-        ]);
+        return view(
+            'livewire.coordinator.dashboard',
+            compact(
+                'centre',
+                'applications',
+                'summary',
+                'recentAttendance'
+            )
+        );
     }
 }

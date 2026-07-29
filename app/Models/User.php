@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Attendance;
 
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
@@ -46,5 +47,13 @@ class User extends Authenticatable
     public function isReviewer(): bool
     {
         return $this->role === 'reviewer';
+    }
+
+    public function recordedAttendances()
+    {
+        return $this->hasMany(
+            Attendance::class,
+            'recorded_by'
+        );
     }
 }
