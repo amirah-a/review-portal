@@ -20,7 +20,17 @@ new #[Layout('layouts.guest')] class extends Component
 
         Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);    }
+        $user = auth()->user();
+
+        $route = match ($user->role) {
+            'chairman' => route('dashboard'),
+            'reviewer' => route('dashboard'),
+            'coordinator' => route('coordinator.dashboard'),
+            default => route('dashboard'),
+        };
+
+        $this->redirect($route, navigate: true);
+    }
 }; ?>
 
 <div class="fixed inset-0 min-h-screen w-screen flex flex-col bg-slate-50/70 overflow-y-auto px-4 py-8 sm:px-6 lg:px-8 z-50">

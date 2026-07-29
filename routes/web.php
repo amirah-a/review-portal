@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CentreController;
+use App\Http\Controllers\CoordinatorController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\IndexController;
 use App\Livewire\ApplicationShow;
@@ -8,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
 
 Route::view('/', 'welcome');
 
-Route::group(['middleware' => ['auth', 'verified']], function () {
+Route::middleware(['auth', 'role:reviewer,chairman'])->group(function () {
     Route::get('/dashboard', [IndexController::class, 'index'])->name('dashboard');
     Route::get('/all-applications', [IndexController::class, 'viewAll'])->name('all-applications');
     Route::get('/centres/{centre}', [CentreController::class, 'show'])->name('centres.show');
@@ -29,6 +30,13 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
      Route::get('/email/send-test', [IndexController::class, 'testMail'])->name('testMail');
      Route::get('/email/send-live', [IndexController::class, 'liveMail'])->name('liveMail');
+
+});
+
+Route::middleware(['auth', 'role:coordinator'])->group(function () {
+    Route::get('/coordinator/dashboard', [CoordinatorController::class, 'index'])->name('coordinator.dashboard');
+    Route::get('/coordinator/attendance', [CoordinatorController::class, 'attendance'])->name('coordinator.attendance');
+
 
 });
 
