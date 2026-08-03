@@ -13,12 +13,17 @@ use Carbon\Carbon;
 #[Layout('layouts.app')]
 class AttendanceRegister extends Component
 {
-    // Array holding selected status per participant: [application_id => status]
+    // Status per participant
     public array $attendance = [];
+
+    // Remarks per participant
+    public array $remarks = [];
 
     public $centre;
 
     public string $selectedDate = '';
+
+
 
     public function mount()
     {
@@ -30,15 +35,14 @@ class AttendanceRegister extends Component
             abort(403, 'No centre assigned to this coordinator.');
         }
 
-        // Set initial date to today
+
         $this->selectedDate = Carbon::today()->format('Y-m-d');
 
         $this->loadAttendance();
     }
 
-    /**
-     * Get the centre name string regardless of whether $this->centre is object or string.
-     */
+
+
     #[Computed]
     public function centreName(): string
     {
@@ -49,9 +53,8 @@ class AttendanceRegister extends Component
         return (string) $this->centre;
     }
 
-    /**
-     * Computed Property: Fetches accepted participants for assigned centre.
-     */
+
+
     #[Computed]
     public function participants()
     {
@@ -62,9 +65,8 @@ class AttendanceRegister extends Component
             ->get();
     }
 
-    /**
-     * Real-time computed summary counts based on active select state.
-     */
+
+
     #[Computed]
     public function summary(): array
     {
@@ -78,73 +80,135 @@ class AttendanceRegister extends Component
         ];
     }
 
-    /**
-     * Triggered automatically by Livewire when the selected date updates.
-     */
+
+
     public function updatedSelectedDate()
     {
         $this->loadAttendance();
     }
 
-    /**
-     * Load existing attendance for the selected date.
-     */
+
+
     public function loadAttendance()
     {
         $this->attendance = [];
+        $this->remarks = [];
+
 
         $date = Carbon::parse($this->selectedDate)->toDateString();
-        $participantIds = $this->participants->pluck('APL_ID')->filter()->toArray();
+
+
+        $participantIds = $this->participants
+            ->pluck('APL_ID')
+            ->filter()
+            ->toArray();
+
 
         if (empty($participantIds)) {
             return;
         }
 
-        // Fetch existing records indexed by application_id
+
+
         $existingRecords = Attendance::whereIn('application_id', $participantIds)
             ->whereDate('attendance_date', $date)
-            ->pluck('status', 'application_id')
-            ->toArray();
+            ->get()
+            ->keyBy('application_id');
 
-        // Map status or default to empty string for every participant
+
+
         foreach ($this->participants as $participant) {
-            $this->attendance[$participant->APL_ID] = $existingRecords[$participant->APL_ID] ?? '';
+
+            $record = $existingRecords[$participant->APL_ID] ?? null;
+
+
+            $this->attendance[$participant->APL_ID] =
+                $record?->status ?? '';
+
+
+            $this->remarks[$participant->APL_ID] =
+                $record?->remarks ?? '';
+
         }
     }
+
+
+
+
 
     public function saveAttendance()
     {
         $this->validate([
+
             'selectedDate' => 'required|date|before_or_equal:today',
+
             'attendance.*' => 'nullable|string|in:Present,Late,Absent,Excused',
+
+            'remarks.*' => 'nullable|string|max:500',
+
         ]);
+
+
 
         $date = Carbon::parse($this->selectedDate)->toDateString();
 
+
+
         foreach ($this->attendance as $applicationId => $status) {
+
+
             if (empty($status)) {
-                // Delete record if status was reset to empty
+
+
                 Attendance::where('application_id', $applicationId)
                     ->whereDate('attendance_date', $date)
                     ->delete();
+
+
                 continue;
+
             }
 
+
+
             Attendance::updateOrCreate(
+
                 [
+
                     'application_id'  => $applicationId,
+
                     'attendance_date' => $date,
+
                 ],
+
+
                 [
-                    'status'      => $status,
+
+                    'status' => $status,
+
+                    'remarks' => $this->remarks[$applicationId] ?? null,
+
                     'recorded_by' => Auth::id(),
-                    'centre'      => $this->centreName,
+
+                    'centre' => $this->centreName,
+
                 ]
+
             );
+
         }
 
-        session()->flash('status', 'Attendance recorded successfully for ' . Carbon::parse($date)->format('d M Y') . '.');
+
+
+        session()->flash(
+            'status',
+            'Attendance recorded successfully for ' .
+            Carbon::parse($date)->format('d M Y') .
+            '.'
+        );
     }
+
+
 
     public function render()
     {
