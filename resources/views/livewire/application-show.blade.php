@@ -636,8 +636,8 @@
 
                                 {{-- BUTTON --}}
                                 <div>
-                                    <button type="submit"
-                                        class="w-full inline-flex items-center justify-center px-4 py-3 text-sm font-semibold text-white bg-amber-600 hover:bg-amber-500 rounded-lg transition">
+                                    <button type="submit" disabled
+                                        class="w-full inline-flex items-center justify-center px-4 py-3 text-sm font-semibold text-white bg-gray-400 hover:bg-gray-400 rounded-lg transition">
                                         Save Review
                                     </button>
                                 </div>
