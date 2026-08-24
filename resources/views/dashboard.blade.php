@@ -186,22 +186,67 @@
                         </div>
 
                         {{-- FOOTER ACTION --}}
-                        <div
-                            class="mt-6 pt-4 border-t border-gray-50 flex items-center justify-between text-sm text-gray-500">
-                            <span class="text-xs font-medium text-gray-400">
-                                Applications metrics breakdown
-                            </span>
+                        <div class="mt-6 pt-5 border-t border-gray-100">
 
-                            <a href="{{ route('centres.show', $centre->id) }}"
-                                class="flex items-center gap-1 text-xs font-semibold text-amber-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition duration-300">
-                                View Details
-                                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                                </svg>
-                            </a>
-                        </div>
+    <div class="flex items-center justify-between">
+
+        {{-- Applications - Left --}}
+        <a href="{{ route('centres.show', $centre->id) }}"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg
+                bg-gray-50 border border-gray-200
+                text-xs font-semibold text-gray-600
+                hover:bg-gray-100 hover:text-gray-900
+                transition duration-200">
+
+            <svg class="w-3.5 h-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2">
+
+                <path stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+
+            </svg>
+
+            Applications
+
+        </a>
+
+
+        {{-- Attendance - Chairman Only --}}
+        @if (auth()->user()->role === 'chairman')
+
+            <a href="{{ route('chairman.attendance.days', $centre->id) }}"
+                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg
+                    bg-amber-50 border border-amber-100
+                    text-xs font-semibold text-amber-700
+                    hover:bg-amber-100 hover:border-amber-200
+                    transition duration-200">
+
+                Attendance
+
+                <svg class="w-3.5 h-3.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2">
+
+                    <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M9 5l7 7-7 7" />
+
+                </svg>
+
+            </a>
+
+        @endif
+
+    </div>
+
+</div>
+
 
                     </div>
                 @endforeach

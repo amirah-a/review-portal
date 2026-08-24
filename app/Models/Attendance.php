@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use App\Models\Application;
+
 class Attendance extends Model
 {
     protected $fillable = [
@@ -32,8 +34,8 @@ class Attendance extends Model
     {
         return $this->belongsTo(
             User::class,
-            'recorded_by'
+            'recorded_by',
+            'id'
         );
     }
-    
 }

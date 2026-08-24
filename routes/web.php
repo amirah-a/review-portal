@@ -7,6 +7,7 @@ use App\Http\Controllers\IndexController;
 use App\Livewire\ApplicationShow;
 use Illuminate\Support\Facades\Storage;
 use App\Livewire\Coordinator\AttendanceRegister;
+use App\Http\Controllers\ChairmanController;
 
 Route::view('/', 'welcome');
 
@@ -37,6 +38,26 @@ Route::middleware(['auth', 'role:coordinator'])->group(function () {
     Route::get('/coordinator/dashboard', [CoordinatorController::class, 'index'])->name('coordinator.dashboard');
     Route::get('/coordinator/attendance', AttendanceRegister::class)->name('coordinator.attendance');
 });
+
+Route::middleware(['auth', 'role:chairman'])
+    ->prefix('chairman')
+    ->name('chairman.')
+    ->group(function () {
+        /*
+         * Attendance centre list
+         */
+        Route::get('/attendance', [ChairmanController::class, 'attendanceCentres'])->name('attendance.centres');
+
+        /*
+         * Attendance days for a centre
+         */
+        Route::get('/attendance/centre/{centre}', [ChairmanController::class, 'attendanceDays'])->name('attendance.days');
+
+        /*
+         * Students and attendance for a particular day
+         */
+        Route::get('/attendance/centre/{centre}/date/{date}', [ChairmanController::class, 'attendanceDay'])->name('attendance.day');
+    });
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])
